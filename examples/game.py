@@ -32,3 +32,4 @@ if __name__ == '__main__':
         env.step(action)
 
     print("rewards_collected", rewards_collected)
+    env.close()
