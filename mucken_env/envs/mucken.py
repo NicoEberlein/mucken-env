@@ -44,7 +44,7 @@ class MuckenEnv(AECEnv):
                 "current_trick_lead_color": spaces.Box(low=0, high=1, shape=(4,), dtype=np.int8),
                 "current_trick_players": spaces.Box(low=-1, high=3, shape=(4,), dtype=np.int8),
                 "current_trick_teams": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.int8),
-                "trick_history": spaces.Box(low=0, high=2, shape=(24,), dtype=np.int8),
+                "trick_history": spaces.Box(low=-1, high=2, shape=(24,), dtype=np.int8),
                 "trumps_already_played": spaces.Box(low=0, high=12, shape=(1,), dtype=np.int8),
                 "high_trumps_already_played": spaces.Box(low=0, high=8, shape=(1,), dtype=np.int8),
                 "color_void_status": spaces.Box(low=0, high=1, shape=(4,4), dtype=np.int8),
