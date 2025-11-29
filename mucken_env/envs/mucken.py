@@ -162,6 +162,8 @@ class MuckenEnv(AECEnv):
 
             self._agent_invalid_action(agent_id)
 
+        self._accumulate_rewards()
+
     def observe(self, agent):
 
         # build trick history

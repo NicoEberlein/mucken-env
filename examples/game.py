@@ -1,5 +1,3 @@
-import numpy as np
-
 from examples.random_agent import Agent
 from mucken_env import MuckenEnv
 
