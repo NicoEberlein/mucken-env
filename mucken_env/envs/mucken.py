@@ -58,6 +58,7 @@ class MuckenEnv(AECEnv):
         self._agent_selector = None
         self.agent_selection = None
         self.rewards = {}
+        self._cumulative_rewards = {}
         self.terminations = {}
         self.truncations = {}
         self.infos = {}
@@ -105,6 +106,9 @@ class MuckenEnv(AECEnv):
 
 
     def step(self, action):
+
+        self._clear_rewards()
+        self._cumulative_rewards[self.agent_selection] = 0
 
         agent_id = self.agent_selection
 
@@ -157,7 +161,6 @@ class MuckenEnv(AECEnv):
         else:
 
             self._agent_invalid_action(agent_id)
-
 
     def observe(self, agent):
 
@@ -348,15 +351,11 @@ class MuckenEnv(AECEnv):
 
     def _agent_invalid_action(self, agent):
         agent_index = self.agent_name_mapping[agent]
-        agent_teammate = (agent_index+2)%4
 
-        # punish agent and teammate for invalid action
-        self.rewards[self.agents[agent_index]] = -1
-        self.rewards[self.agents[agent_teammate]] = -1
-
-        # reward other team
-        self.rewards[self.agents[(agent_index + 1) % 4]] = 1
-        self.rewards[self.agents[(agent_teammate + 1) % 4]] = 1
+        if agent_index % 1 == 0:
+            self._give_rewards(1, -1)
+        else:
+            self._give_rewards(-1, 1)
 
         self.terminations = { agent: True for agent in self.agents }
 
@@ -370,11 +369,10 @@ class MuckenEnv(AECEnv):
 
     def _give_rewards(self, reward_0, reward_1):
 
-        self._cumulative_rewards[self.agents[0]] = reward_0
-        self._cumulative_rewards[self.agents[1]] = reward_1
-        self._cumulative_rewards[self.agents[2]] = reward_0
-        self._cumulative_rewards[self.agents[3]] = reward_1
-
+        self.rewards[self.agents[0]] += reward_0
+        self.rewards[self.agents[1]] += reward_1
+        self.rewards[self.agents[2]] += reward_0
+        self.rewards[self.agents[3]] += reward_1
 
     def _get_winner_of_trick(self):
         current_card_stack = []
