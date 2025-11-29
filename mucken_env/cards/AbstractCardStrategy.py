@@ -33,7 +33,7 @@ class AbstractCardStrategy(ABC):
             return True
         if self.is_trump(first_card) and self.is_trump(card_played):
             return True
-        if not self.is_trump(first_card) and self._compare_colors(first_card.color, card_played.color) == 0:
+        if not self.is_trump(first_card) and self._compare_colors(first_card.color, card_played.color) == 0 and not self.is_trump(card_played):
             return True
 
         permitted = True
