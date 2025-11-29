@@ -45,6 +45,8 @@ class MuckenRenderer:
 
             self.clock = pygame.time.Clock()
 
+        pygame.event.pump()
+
         if len(self.assets) == 0:
             self._load_assets()
 
