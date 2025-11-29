@@ -33,11 +33,11 @@ class MuckenEnv(AECEnv):
             zip(self.possible_agents, list(range(len(self.possible_agents))))
         )
 
-        self._action_spaces = {
+        self.action_spaces = {
             agent: spaces.Discrete(24) for agent in self.possible_agents
         }
 
-        self._observation_spaces = {
+        self.observation_spaces = {
             agent: spaces.Dict({
                 "hand": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
                 "current_trick_cards": spaces.Box(low=-1, high=23, shape=(4,), dtype=np.int8),
