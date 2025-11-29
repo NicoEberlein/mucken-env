@@ -1,7 +1,4 @@
-import os
-import time
 import uuid
-from typing import Dict
 
 import numpy as np
 from gymnasium import spaces
@@ -11,12 +8,13 @@ from pettingzoo.utils.agent_selector import agent_selector
 
 from mucken_env.cards.Card import ALL_CARDS, get_card_by_id, get_unique_id
 from mucken_env.cards.MuckCardStrategy import MuckCardStrategy
+from mucken_env.envs.renderer import MuckenRenderer
 
 
 class MuckenEnv(AECEnv):
 
     metadata = {
-        "render_modes": ["human", "rgb_array"],
+        "render_modes": ["human", "rgb_array", "text"],
         "name": "mucken-v0.1",
         "is_parallelizable": False,
         "render_fps": 2,
@@ -52,6 +50,8 @@ class MuckenEnv(AECEnv):
                 "action_mask": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
             }) for agent in self.possible_agents
         }
+
+        self.renderer = MuckenRenderer(self.render_mode)
 
         self.strategy = None
         self.agents = []
@@ -244,61 +244,11 @@ class MuckenEnv(AECEnv):
             'action_mask': action_mask,
         }
 
-    def render(self):
-        if self.render_mode != "human":
-            return
-
-        if len(self.game_state['current_trick']) == 0 and len(self.game_state['last_completed_trick']) == 0:
-            return
-
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-        trick_tuples_to_render = self.game_state.get('last_completed_trick', [])
-
-        if not trick_tuples_to_render:
-            trick_tuples_to_render = self.game_state.get('current_trick', [])
-
-        cards_on_table: Dict[str, str] = {
-            player_id: str(card) for player_id, card in trick_tuples_to_render
-        }
-
-        p0_card = cards_on_table.get('player_0', '(wartet...)').center(18)
-        p1_card = cards_on_table.get('player_1', '(wartet...)').center(18)
-        p2_card = cards_on_table.get('player_2', '(wartet...)').center(18)
-        p3_card = cards_on_table.get('player_3', '(wartet...)').center(18)
-        header = f"--- Runde: {self.game_state.get('trick_index', 0) + 1} / 4 ---"
-
-        table_view = f"""
-        {header.center(50)}
-        +--------------------------------------------------+
-        |                                                  |
-        |                Spieler 2 (Partner)               |
-        |              {p2_card}              |
-        |                                                  |
-        | Spieler 1 (Gegner)        Spieler 3 (Gegner)     |
-        | {p1_card}      {p3_card} |
-        |                                                  |
-        |                   Spieler 0 (Sie)                  |
-        |              {p0_card}              |
-        |                                                  |
-        +--------------------------------------------------+
-        """
-
-        active_player_info = f"--> {self.agent_selection} ist am Zug."
-
-        current_hand_list = self.game_state.get('hands', {}).get(self.agent_selection, [])
-        hand_info = "Hand: " + " ".join(str(card) for card in current_hand_list)
-
-        print(table_view)
-        print(active_player_info)
-        print(hand_info)
-
-        self.game_state['last_completed_trick'] = []
-
-        time.sleep(1)
-
     def close(self):
-        pass
+        self.renderer.close()
+
+    def render(self):
+        self.renderer.render(self.game_state, self.agent_selection)
 
     def _initialize_game_state(self, seed):
 
