@@ -4,15 +4,15 @@ from pathlib import Path
 from typing import Dict
 
 import numpy as np
-import pygame
 
 from mucken_env.cards.Card import CARD_TO_ID
 
 
 class MuckenRenderer:
 
-    def __init__(self, render_mode):
+    def __init__(self, render_mode, render_fps):
         self.render_mode = render_mode
+        self.render_fps = render_fps
         self.screen = None
         self.clock = None
         self.window_size = (1000,800)
@@ -32,6 +32,8 @@ class MuckenRenderer:
             self._render_human(game_state, agent_selection)
 
     def _render_human(self, game_state, agent_selection):
+
+        import pygame
 
         if self.screen is None:
             pygame.init()
@@ -54,11 +56,10 @@ class MuckenRenderer:
 
         if self.render_mode == "human":
             pygame.display.flip()
-            self.clock.tick(4)
         elif self.render_mode == "rgb_array":
             return np.transpose(np.array(pygame.surfarray.pixels3d(self.screen)), axes=(1, 0, 2))
 
-        time.sleep(3)
+        self.clock.tick(self.render_fps)
 
     def _render_text(self, game_state, agent_selection):
 
@@ -104,7 +105,8 @@ class MuckenRenderer:
 
         game_state['last_completed_trick'] = []
 
-        time.sleep(1)
+        if self.render_fps > 0:
+            time.sleep(1.0 / self.render_fps)
 
     def close(self):
         if self.screen is not None:
@@ -144,6 +146,7 @@ class MuckenRenderer:
                 self.screen.blit(img, rect)
 
     def _draw_hands(self, game_state):
+
         import pygame
 
         positions = {

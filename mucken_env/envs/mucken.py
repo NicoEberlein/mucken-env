@@ -20,10 +20,13 @@ class MuckenEnv(AECEnv):
         "render_fps": 2,
     }
 
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, render_fps=None):
 
         self.render_mode = render_mode
+        self.render_fps = render_fps if render_fps is not None else self.metadata['render_fps']
         self.possible_agents = ["player_0", "player_1", "player_2", "player_3"]
+
+        self.renderer = MuckenRenderer(self.render_mode, self.render_fps)
 
         super().__init__()
 
@@ -50,8 +53,6 @@ class MuckenEnv(AECEnv):
                 "action_mask": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
             }) for agent in self.possible_agents
         }
-
-        self.renderer = MuckenRenderer(self.render_mode)
 
         self.strategy = None
         self.agents = []
