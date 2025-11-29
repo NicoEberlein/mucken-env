@@ -1,1 +1,1 @@
-from mucken_env.envs.mucken import MuckenEnv
+from .mucken import MuckenEnv

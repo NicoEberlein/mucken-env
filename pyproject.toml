@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mucken-env"
+version = "0.1.0"
+description = "A PettingZoo environment for the Bavarian card game Mucken"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Nico Eberlein", email = "nico@eberln.de" }
+]
+keywords = ["reinforcement-learning", "pettingzoo", "gymnasium", "card-game", "multi-agent"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "pettingzoo>=1.24.0",
+    "gymnasium>=0.29.0",
+    "numpy>=1.21.0",
+    "pygame>=2.6.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=9.0",
+    "pytest-cov>=7.0"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/NicoEberlein/mucken-env"
+"Bug Tracker" = "https://github.com/NicoEberlein/mucken-env/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mucken_env*"]
+namespaces = false
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["*.py"]
