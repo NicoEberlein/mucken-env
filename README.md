@@ -71,7 +71,7 @@ mucken-env/
 
 ### Code
 
-This project is published under the **MIT License**. See [LICENSE](https://www.google.com/search?q=LICENSE) for details.
+This project is published under the **MIT License**. See [LICENSE](LICENSE) for details.
 
 ### Game Assets (Card Images)
 
