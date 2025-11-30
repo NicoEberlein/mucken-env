@@ -1,8 +1,6 @@
 import unittest
 
-from mucken_env.cards.GeierCardStrategy import GeierCardStrategy
 from mucken_env.cards.MuckCardStrategy import MuckCardStrategy
-from mucken_env.cards.WenzCardStrategy import WenzCardStrategy
 from mucken_env.cards.CardFactory import CardFactory
 from mucken_env.cards.Card import Card
 from mucken_env.cards.enums import Face, Color

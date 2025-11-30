@@ -7,7 +7,7 @@ from pettingzoo import AECEnv
 from pettingzoo.utils.agent_selector import agent_selector
 
 from mucken_env.cards.Card import ALL_CARDS, get_card_by_id, get_unique_id
-from mucken_env.cards.MuckCardStrategy import MuckCardStrategy
+from mucken_env.cards import MuckCardStrategy
 from mucken_env.envs.renderer import MuckenRenderer
 
 

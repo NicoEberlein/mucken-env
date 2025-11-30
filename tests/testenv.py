@@ -1,7 +1,10 @@
 import numpy as np
-import pytest
 from mucken_env import MuckenEnv
 from pettingzoo.test import api_test
+
+from mucken_env.cards.Card import get_unique_id, Card
+from mucken_env.cards.enums import Color, Face
+
 
 def test_pettingzoo_api():
     env = MuckenEnv()
