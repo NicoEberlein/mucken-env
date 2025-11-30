@@ -35,13 +35,21 @@ class TestMuck(unittest.TestCase):
             Card(Color.BLATT, Face.OBER)
         ]
 
+        card_stack_3_cards = [
+            Card(Color.SCHELLE, Face.UNTER),
+            Card(Color.HERZ, Face.OBER),
+            Card(Color.SCHELLE, Face.NEUN)
+        ]
+
         res_trump_wins = self.muck_strategy.who_won(card_stack_trump_wins)
         res_color_wins = self.muck_strategy.who_won(card_stack_color_wins)
         res_unusual_behaviour = self.muck_strategy.who_won(card_stack_unusual_behaviour)
+        res_3_cards = self.muck_strategy.who_won(card_stack_3_cards)
 
         self.assertEqual(res_trump_wins, 3)
         self.assertEqual(res_color_wins, 0)
         self.assertEqual(res_unusual_behaviour, 3)
+        self.assertEqual(res_3_cards, 1)
 
     def test_card_permitted_trump_first_permitted(self):
 
