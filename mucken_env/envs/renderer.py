@@ -28,8 +28,10 @@ class MuckenRenderer:
 
         if self.render_mode == "text":
             self._render_text(game_state, agent_selection)
-        elif self.render_mode == "human":
-            self._render_human(game_state, agent_selection)
+        elif self.render_mode == "human" or self.render_mode == "rgb_array":
+            return self._render_human(game_state, agent_selection)
+
+        return None
 
     def _render_human(self, game_state, agent_selection):
 
@@ -54,7 +56,7 @@ class MuckenRenderer:
 
         self._draw_table(game_state)
         self._draw_hands(game_state)
-        self._draw_info(agent_selection)
+        self._draw_info(game_state, agent_selection)
 
         if self.render_mode == "human":
             pygame.display.flip()
@@ -117,11 +119,15 @@ class MuckenRenderer:
             pygame.quit()
             self.screen = None
 
-    def _draw_info(self, agent_selection):
+    def _draw_info(self, game_state, agent_selection):
         import pygame
         font = pygame.font.SysFont("Arial", 24)
-        text = font.render(f"Am Zug: {agent_selection}", True, (255, 255, 255))
+        text = font.render(f"Turn: {agent_selection}", True, (255, 255, 255))
         self.screen.blit(text, (10, 10))
+
+        if game_state['winner_last_round'] is not None:
+            text_winner = font.render(f"Winner last round: {game_state['winner_last_round']}", True, (255, 255, 255))
+            self.screen.blit(text_winner, (10, 40))
 
     def _draw_table(self, game_state):
 

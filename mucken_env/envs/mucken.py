@@ -137,6 +137,7 @@ class MuckenEnv(AECEnv):
                 winner = self._get_winner_of_trick()
                 winner_index = self.agent_name_mapping[winner]
                 score = self._sum_card_stack()
+                self.game_state['winner_last_round'] = winner
                 self.game_state['player_scores'][winner] += score
                 self.game_state['player_scores'][self._get_team_mate(winner)] += score
 
@@ -251,7 +252,7 @@ class MuckenEnv(AECEnv):
         self.renderer.close()
 
     def render(self):
-        self.renderer.render(self.game_state, self.agent_selection)
+        return self.renderer.render(self.game_state, self.agent_selection)
 
     def _initialize_game_state(self, seed):
 
@@ -278,6 +279,7 @@ class MuckenEnv(AECEnv):
             "trick_card_history": [],
             # current_trick: [("player_0",Card(...)),...]
             "current_trick": [],
+            "winner_last_round": None,
             "last_completed_trick": [],
             "high_trumps_already_played": 0,
             "trumps_already_played": 0,
