@@ -16,6 +16,8 @@ Mucken is a traditional Bavarian card game for 4 people, similar to Schafkopf, b
 * **Goal:** The team must collect more points through tricks than the opposing team.
 * **Trumps:** Ober, Unter, and all Heart cards.
 
+![Mucken Gameplay Demo](demo.gif)
+
 ## Installation
 
 Clone the repository and install it in "editable" mode (recommended for development):
@@ -36,7 +38,7 @@ See `game.py` in the examples for a working game loop with random agents.
 ### Action Space
 
 The Action Space is `Discrete(24)`. Each integer ID corresponds to a specific card.
-A mapping of IDs to cards (e.g., `0` = Acorn Ober) is implemented in the code.
+A mapping of IDs to cards (e.g., `0` = Bells 9) is implemented in the code.
 
 **Important:** The game requires players to **follow suit**. The environment provides an `action_mask` in the observation. Agents *must* use this mask, as playing an invalid card leads to immediate termination of the episode and a negative reward.
 
@@ -51,8 +53,8 @@ The observation is a `Dict` space containing both raw data and **engineered feat
 
 The environment uses a **hybrid reward system** (dense + sparse) to solve the credit assignment problem:
 
-1.  **Intermediate Rewards:** After each trick, the winners of the trick receive points based on the card values (normalized). The losing team receives the negative value (zero-sum).
-2.  **Final Reward:** At the end of the game (after 6 tricks), the overall victory is evaluated. The winning team receives a significant bonus (+ game score), the losing team a penalty.
+1.  **Intermediate Rewards:** After each round, the winners of the trick receive points based on the card values (normalized). The losing team receives the negative value (zero-sum).
+2.  **Final Reward:** At the end of the game (after 6 rounds), the overall victory is evaluated. The winning team receives a significant bonus (+ game score), the losing team a penalty.
 
 ## File Structure
 
