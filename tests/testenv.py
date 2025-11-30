@@ -21,3 +21,20 @@ def test_seeding():
 
     np.testing.assert_array_equal(hand0, hand1)
 
+def test_invalid_action():
+    env = MuckenEnv()
+    env.reset(seed=41)
+
+    card_id_first = get_unique_id(Card(Color.BLATT, Face.KOENIG))
+    env.step(card_id_first)
+
+    _, _, termination, truncation, _ = env.last()
+    assert not (termination or truncation)
+
+    card_id_invalid_step = get_unique_id(Card(Color.EICHEL, Face.UNTER))
+    env.step(card_id_invalid_step)
+
+    _, _, termination, truncation, _ = env.last()
+    assert termination or truncation
+
+
