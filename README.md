@@ -28,6 +28,12 @@ cd mucken-env
 pip install -e .
 ```
 
+Or install it directly from github:
+
+```
+pip install git+https://github.com/NicoEberlein/mucken-env.git
+```
+
 ## Usage (Quickstart)
 
 The environment uses the PettingZoo AEC API, where agents act sequentially (`agent_iter`).
