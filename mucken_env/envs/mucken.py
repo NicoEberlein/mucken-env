@@ -41,6 +41,7 @@ class MuckenEnv(AECEnv):
         self.observation_spaces = {
             agent: spaces.Dict({
                 "hand": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
+                "action_mask": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
                 "current_trick_cards": spaces.Box(low=-1, high=23, shape=(4,), dtype=np.int8),
                 "current_trick_lead_color": spaces.Box(low=0, high=1, shape=(4,), dtype=np.int8),
                 "current_trick_players": spaces.Box(low=-1, high=3, shape=(4,), dtype=np.int8),
@@ -50,7 +51,6 @@ class MuckenEnv(AECEnv):
                 "high_trumps_already_played": spaces.Box(low=0, high=8, shape=(1,), dtype=np.int8),
                 "color_void_status": spaces.Box(low=0, high=1, shape=(4,4), dtype=np.int8),
                 "trump_void_status": spaces.Box(low=0, high=1, shape=(4,), dtype=np.int8),
-                "action_mask": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
             }) for agent in self.possible_agents
         }
 
@@ -230,9 +230,9 @@ class MuckenEnv(AECEnv):
         # build color of first card of current trick
         current_trick_lead_color = np.full((4,), 0, dtype=np.int8)
         if len(self.game_state['current_trick']) > 0:
-            lead_color = self.game_state['current_trick'][0][1].color
-            current_trick_lead_color[lead_color.value] = 1
-
+            if not self.strategy.is_trump(self.game_state['current_trick'][0][1]):
+                lead_color = self.game_state['current_trick'][0][1].color
+                current_trick_lead_color[lead_color.value] = 1
 
         return {
             'hand': hand,
