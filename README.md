@@ -55,6 +55,81 @@ The observation is a `Dict` space containing both raw data and **engineered feat
 > [!NOTE]
 > **Work in Progress:** A detailed explanation of the observation space will follow
 
+| Observation                | Shape | Value (low/high) |  |
+|----------------------------|------|------------------|-|
+| hand                       | (24,) | (0/1)            | |
+| action_mask                | (24,) | (0/1)            | |
+| current_trick_cards        | (4,) | (-1,23)          | |
+| current_trick_lead_color   | (4,) | (0/1)            | |
+| current_trick_players      | (4,) | (-1/3)           | |
+| current_trick_teams        | (4,) | (-1/1)           | |
+| trick_history              | (24,) | (-1/2)           | |
+| trumps_already_played      | (1,) | (0/12)           | |
+| high_trumps_already_played | (1,) | (0/8)            | |
+| color_void_status          | (4,4) | (0/1)            | |
+| trump_void_status          | (4,) | (0/1)            | |
+
+<details>
+<summary>Click to see detailed descriptions of all observations</summary>
+
+#### Agent information
+These are the most relevant features. They are needed for every human- and non-human agent in order to play the game.
+
+##### hand
+Binary encoding to tell the agents which card ids they currently have on their hand.
+
+##### action_mask
+Binary mask for all legal steps in the current state. Must be considered during whatever card choosing mechanism the agent uses.
+
+##### current_trick_cards
+Shows which cards were already played in the current game by other agents.
+Each index can either be the `id` of the played card or `-1` if no card has been played yet.
+
+#### Additional trick information
+
+This information is primarily useful for non-human agents.
+
+##### current_trick_lead_color
+One-hot encoding to tell the agents what color was the first card of the current trick.
+Necessary because the ruleset requires all players to follow suit if possible.
+If the first card was a trump, all indices remain `0`.
+
+##### current_trick_players
+Indicates which player played which card in the current trick. `-1` if it wasn't the player's turn yet.
+**Example:** `[3,0,1,-1]` means that the first card in the current trick was played by `player_3`, the second by `player_0` and the third by `player_1`.
+`player_2` has not played yet.
+
+##### current_trick_teams
+Same as `current_trick_players` but instead of indicating the player of the card it indicates the team index `0` or `1` in order to clarify the teams to non-human agents.
+
+#### Engineered features
+
+These features add deeper insights in the game and were added to enhance the training of Reinforcement Learning models.
+
+##### trick_history
+Indicates which cards have already been played in the current and past tricks.
+A card can either be played by the agent's team (`0`), by the enemies' team (`1`) or be unplayed (`-1`).
+
+##### trumps_already_played
+A scalar which represents how many trumps have already been played. All trumps are included.
+
+##### high_trumps_already_played
+A scalar which represents how many trumps have already been played. Only the high trumps `O` and `U` are included.
+In game modes `Wenz` and `Geier` this is identical to `trumps_already_played` 
+
+##### color_void_status
+Is a (4,4) array which shows when players are out of a specific color. The rows represent the colors and the columns the players.
+The array will be full of `0` initially. The corresponding index will change once a player doesn't add the color the first card of the trick has.
+
+**Example**: The first card played by `player_0` is of color `EICHEL` (and not a trump). `player_1` plays a trump.
+`color_void_status[3][1]` is set to `1`
+
+##### trump_void_status
+This shows which player is out of trumps and is not able to take the trick with a trump anymore. Initially it will be `[0,0,0,0]`.
+As soon as a player adds a non-trump card and the first card of the trick was a trump the corresponding index will change to `1`.
+
+</details>
+
 ### Rewards
 
 The environment uses a **hybrid reward system** (dense + sparse) to solve the credit assignment problem:
