@@ -126,43 +126,44 @@ class MuckenEnv(AECEnv):
         first_card = None if len(self.game_state['current_trick']) == 0 else self.game_state['current_trick'][0][1]
 
         card_permitted = self.strategy.card_permitted(first_card, played_card, self.game_state['hands'][agent_id])
-        if card_permitted:
+        player_has_card = played_card in self.game_state['hands'][agent_id]
 
-            self._update_void_status(agent_id, played_card, first_card)
-            self._apply_action(agent_id, played_card)
+        if not card_permitted or not player_has_card:
+            self._agent_invalid_action(agent_id)
+            self._accumulate_rewards()
+            return
+
+        self._update_void_status(agent_id, played_card, first_card)
+        self._apply_action(agent_id, played_card)
+        self.agent_selection = self._agent_selector.next()
+
+        if self.game_state['trick_index'] == 4:
+            # Round is over
+            winner = self._get_winner_of_trick()
+            winner_index = self.agent_name_mapping[winner]
+            score = self._sum_card_stack()
+            self.game_state['winner_last_round'] = winner
+            self.game_state['player_scores'][winner] += score
+            self.game_state['player_scores'][self._get_team_mate(winner)] += score
+
+            if winner == "player_0" or winner == "player_2":
+                self._give_rewards(score/120, (-score)/120)
+            else:
+                self._give_rewards((-score) / 120, score / 120)
+
+            self._reset_after_round()
+
+            reordered_agents = self.agents[winner_index:] + self.agents[:winner_index]
+
+            self._agent_selector.reinit(reordered_agents)
             self.agent_selection = self._agent_selector.next()
 
-            if self.game_state['trick_index'] == 4:
-                # Round is over
-                winner = self._get_winner_of_trick()
-                winner_index = self.agent_name_mapping[winner]
-                score = self._sum_card_stack()
-                self.game_state['winner_last_round'] = winner
-                self.game_state['player_scores'][winner] += score
-                self.game_state['player_scores'][self._get_team_mate(winner)] += score
-
-                if winner == "player_0" or winner == "player_2":
-                    self._give_rewards(score/120, (-score)/120)
-                else:
-                    self._give_rewards((-score) / 120, score / 120)
-
-                self._reset_after_round()
-
-                reordered_agents = self.agents[winner_index:] + self.agents[:winner_index]
-
-                self._agent_selector.reinit(reordered_agents)
-                self.agent_selection = self._agent_selector.next()
-
-                #Game is over
-                if self.game_state['round_index'] == 5:
-                    # Game is over
-                    self._calc_final_reward()
-                    for agent in self.agents:
-                        self.terminations[agent] = True
-
-        else:
-
-            self._agent_invalid_action(agent_id)
+            #Game is over
+            if self.game_state['round_index'] == 5:
+                # Game is over
+                self._calc_final_reward()
+                for agent in self.agents:
+                    self.terminations[agent] = True
 
         self._accumulate_rewards()
 
@@ -307,10 +308,10 @@ class MuckenEnv(AECEnv):
     def _agent_invalid_action(self, agent):
         agent_index = self.agent_name_mapping[agent]
 
-        if agent_index % 1 == 0:
-            self._give_rewards(1, -1)
-        else:
+        if agent_index % 2 == 0:
             self._give_rewards(-1, 1)
+        else:
+            self._give_rewards(1, -1)
 
         self.terminations = { agent: True for agent in self.agents }
 
