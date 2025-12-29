@@ -3,7 +3,7 @@ from mucken_env import MuckenEnv
 
 if __name__ == '__main__':
 
-    env = MuckenEnv(render_mode="human")
+    env = MuckenEnv(render_mode="human", render_fps=0.25)
 
     agents = {
         "player_0": Agent(),
