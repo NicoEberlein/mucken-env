@@ -85,17 +85,12 @@ class MuckenEnv(AECEnv):
         self.terminations = { agent: False for agent in self.agents }
         self.truncations = { agent: False for agent in self.agents }
 
-        self.infos = {agent: {
-            "round_index": 0,
-        } for agent in self.agents}
-
         self.game_state = self._initialize_game_state(seed=seed)
 
-        for agent in self.agents:
-            hand_score = 0
-            for card in self.game_state["hands"][agent]:
-                hand_score += self.strategy.get_hand_score(card)
-            self.infos[agent]["hand_score"] = hand_score/self.strategy.get_max_score()
+        self.infos = {agent: {
+            "round_index": 0,
+            "hand_score": self.game_state["hand_scores"][agent],
+        } for agent in self.agents}
 
         self._agent_selector = agent_selector(self.agents)
         self.agent_selection = self._agent_selector.next()
@@ -270,12 +265,21 @@ class MuckenEnv(AECEnv):
 
             hands[player_id].append(card)
 
+
+        hand_scores = { agent: 0 for agent in self.agents }
+        for agent in self.possible_agents:
+            hand_score = 0
+            for card in hands[agent]:
+                hand_score += self.strategy.get_hand_score(card)
+            hand_scores[agent] = hand_score / self.strategy.get_max_score()
+
         new_state = {
             "id": str(uuid.uuid4()),
             "round_index": 0,
             "trick_index": 0,
             "hands": hands,
-            "player_scores": { agent: 0 for agent in self.possible_agents },
+            "hand_scores": hand_scores,
+            "player_scores": { agent: 0 for agent in self.agents },
             # trick_card_history: [[("player_0", Card(...))],[],[],[],[],[]]
             "trick_card_history": [],
             # current_trick: [("player_0",Card(...)),...]
