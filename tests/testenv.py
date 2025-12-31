@@ -66,4 +66,24 @@ def test_missing_card_player_1():
     _, _, termination, truncation, _ = env.last()
     assert termination
 
+def test_high_card_status():
+
+    env = MuckenEnv()
+    env.reset(seed=41)
+
+    observation, _, _, _, _ = env.last()
+
+    assert observation['high_card_status'][0] == 0
+
+    env.step(get_unique_id(Card(Color.EICHEL, Face.OBER)))
+    observation, _, _, _, _ = env.last()
+
+    assert observation['high_card_status'][0] == 1
+
+    env.step(get_unique_id(Card(Color.BLATT, Face.UNTER)))
+    observation, _, _, _, _ = env.last()
+
+    assert observation['high_card_status'][5] == 1
+
+
 
