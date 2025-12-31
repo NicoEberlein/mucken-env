@@ -1,9 +1,15 @@
 from mucken_env.cards.AbstractCardStrategy import AbstractCardStrategy
 from mucken_env.cards.Card import Card
-from mucken_env.cards.enums import Face
+from mucken_env.cards.enums import Face, Color
 
 
 class GeierCardStrategy(AbstractCardStrategy):
+
+    CARDS_OF_INTEREST = [
+        Card(color, face)
+        for face in [Face.OBER, Face.ASS]
+        for color in [Color.EICHEL, Color.BLATT, Color.HERZ, Color.SCHELLE]
+    ]
 
     def who_won(self, cards: list[Card]) -> int:
         highest_card = 0
@@ -41,4 +47,7 @@ class GeierCardStrategy(AbstractCardStrategy):
 
     def get_max_score(self) -> int:
         return 4*10+2*5
+
+    def get_cards_of_interest(self) -> list[Card]:
+        return self.CARDS_OF_INTEREST
 

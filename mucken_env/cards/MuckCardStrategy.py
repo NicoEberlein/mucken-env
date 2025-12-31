@@ -4,6 +4,12 @@ from mucken_env.cards.enums import Face, Color
 
 class MuckCardStrategy(AbstractCardStrategy):
 
+    CARDS_OF_INTEREST = [
+        Card(color, face)
+        for face in [Face.OBER, Face.UNTER, Face.ASS]
+        for color in [Color.EICHEL, Color.BLATT, Color.HERZ, Color.SCHELLE]
+    ]
+
     def _contains_trump(self, cards: list[Card]):
         has_trump = False
         for card in cards:
@@ -73,5 +79,8 @@ class MuckCardStrategy(AbstractCardStrategy):
 
     def get_max_score(self) -> int:
         return 4*10+2*8
+
+    def get_cards_of_interest(self) -> list[Card]:
+        return self.CARDS_OF_INTEREST
             
 

@@ -6,6 +6,8 @@ from mucken_env.cards.enums import Color, Face
 
 class AbstractCardStrategy(ABC):
 
+    CARDS_OF_INTEREST = []
+
     def _compare_faces(self, face_0: Face, face_1: Face):
         return face_0.value - face_1.value
 
@@ -26,6 +28,10 @@ class AbstractCardStrategy(ABC):
 
     @abstractmethod
     def who_won(self, cards: list[Card]) -> int:
+        pass
+
+    @abstractmethod
+    def get_cards_of_interest(self) -> list[Card]:
         pass
 
     def card_permitted(self, first_card: Card, card_played: Card, player_cards: list[Card]) -> bool:

@@ -41,16 +41,18 @@ class MuckenEnv(AECEnv):
         self.observation_spaces = {
             agent: spaces.Dict({
                 "hand": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
-                "action_mask": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
+                "hand_score": spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
                 "current_trick_cards": spaces.Box(low=-1, high=23, shape=(4,), dtype=np.int8),
                 "current_trick_lead_color": spaces.Box(low=0, high=1, shape=(4,), dtype=np.int8),
                 "current_trick_players": spaces.Box(low=-1, high=3, shape=(4,), dtype=np.int8),
                 "current_trick_teams": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.int8),
                 "trick_history": spaces.Box(low=-1, high=2, shape=(24,), dtype=np.int8),
                 "trumps_already_played": spaces.Box(low=0, high=12, shape=(1,), dtype=np.int8),
-                "high_trumps_already_played": spaces.Box(low=0, high=8, shape=(1,), dtype=np.int8),
                 "color_void_status": spaces.Box(low=0, high=1, shape=(4,4), dtype=np.int8),
                 "trump_void_status": spaces.Box(low=0, high=1, shape=(4,), dtype=np.int8),
+                "high_card_status": spaces.Box(low=0, high=1, shape=(12,), dtype=np.int8),
+                "current_score": spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
+                "action_mask": spaces.Box(low=0, high=1, shape=(24,), dtype=np.int8),
             }) for agent in self.possible_agents
         }
 
@@ -129,6 +131,7 @@ class MuckenEnv(AECEnv):
             return
 
         self._update_void_status(agent_id, played_card, first_card)
+        self._update_high_card_status(played_card)
         self._apply_action(agent_id, played_card)
         self.agent_selection = self._agent_selector.next()
 
@@ -232,15 +235,17 @@ class MuckenEnv(AECEnv):
 
         return {
             'hand': hand,
+            'hand_score': np.array([self.game_state['hand_scores'][agent]], dtype=np.float32),
             'current_trick_cards': current_trick_cards,
             'current_trick_lead_color': current_trick_lead_color,
             'current_trick_players': current_trick_players,
             'current_trick_teams': current_trick_teams,
             'trick_history': trick_history,
             'trumps_already_played': np.array([self.game_state['trumps_already_played']], dtype=np.int8),
-            'high_trumps_already_played': np.array([self.game_state['high_trumps_already_played']], dtype=np.int8),
             'color_void_status': self.game_state['color_void_status'],
             'trump_void_status': self.game_state['trump_void_status'],
+            'high_card_status': self.game_state['high_card_status'],
+            'current_score': np.array([self.game_state['player_scores'][agent]/120], dtype=np.float32),
             'action_mask': action_mask,
         }
 
@@ -286,11 +291,11 @@ class MuckenEnv(AECEnv):
             "current_trick": [],
             "winner_last_round": None,
             "last_completed_trick": [],
-            "high_trumps_already_played": 0,
             "trumps_already_played": 0,
             "color_void_status": np.full((4,4), 0, dtype=np.int8),
             "trump_void_status": np.full((4,), 0, dtype=np.int8),
             "has_played_mask": { agent: 0 for agent in self.possible_agents },
+            "high_card_status": np.full((12,), 0, dtype=np.int8),
         }
 
         return new_state
@@ -299,7 +304,6 @@ class MuckenEnv(AECEnv):
         self.game_state['current_trick'].append((agent, action))
         self.game_state['hands'][agent].remove(action)
         self.game_state['trick_index'] += 1
-        self.game_state['high_trumps_already_played'] += 1 if self.strategy.is_trump(action, must_be_high=True) else 0
         self.game_state['trumps_already_played'] += 1 if self.strategy.is_trump(action) else 0
 
     def _reset_after_round(self):
@@ -364,4 +368,11 @@ class MuckenEnv(AECEnv):
             color_index = first_card.color.value
             self.game_state['color_void_status'][color_index][self.agent_name_mapping[agent]] = 1
             return
+
+    def _update_high_card_status(self, played_card):
+        cards_of_interest = self.strategy.get_cards_of_interest()
+        if played_card in cards_of_interest:
+            index = cards_of_interest.index(played_card)
+            self.game_state['high_card_status'][index] = 1
+
 
