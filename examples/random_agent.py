@@ -1,10 +1,10 @@
 import numpy as np
 
-class Agent:
+class RandomAgent:
 
-    def choose_action(self, observation):
+    def choose_action(self, observation, info):
         p = np.random.rand(24)
-        final_p = (p * observation['action_mask'])
+        final_p = (p * info['action_mask'])
         return np.argmax(final_p)
 
 

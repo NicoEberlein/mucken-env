@@ -1,15 +1,16 @@
-from examples.random_agent import Agent
+from examples.random_agent import RandomAgent
 from mucken_env import MuckenEnv
+from mucken_env import MuckenRLWrapper
 
 if __name__ == '__main__':
 
-    env = MuckenEnv(render_mode="human", render_fps=0.25)
+    env = MuckenRLWrapper(MuckenEnv(render_mode="human", render_fps=0.25))
 
     agents = {
-        "player_0": Agent(),
-        "player_1": Agent(),
-        "player_2": Agent(),
-        "player_3": Agent(),
+        "player_0": RandomAgent(),
+        "player_1": RandomAgent(),
+        "player_2": RandomAgent(),
+        "player_3": RandomAgent(),
     }
 
     rewards_collected = { agent: 0.0 for agent in agents }
@@ -27,7 +28,7 @@ if __name__ == '__main__':
         action = None
 
         if not (termination or truncation):
-            action = agents[agent_id].choose_action(observation)
+            action = agents[agent_id].choose_action(observation, info)
 
         env.step(action)
 
