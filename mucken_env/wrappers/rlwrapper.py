@@ -19,7 +19,6 @@ class MuckenRLWrapper(BaseWrapper):
                     continue
                 flat_dim += np.prod(subspace.shape)
 
-            print(f"[MuckenRLWrapper] observation space shape: ({flat_dim},)")
             self.observation_spaces[agent] = spaces.Box(-np.inf, np.inf, shape=(int(flat_dim),), dtype=np.float32)
 
     def last(self, observe=True):
